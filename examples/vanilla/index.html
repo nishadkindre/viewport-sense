@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>viewport-sense Vanilla Example</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .demo-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid #3498db;
+        }
+
+        .demo-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .info-value {
+            color: #7f8c8d;
+            font-family: 'Courier New', monospace;
+            background: #ecf0f1;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .responsive-demo {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn.active {
+            background: #e74c3c;
+        }
+
+        .visibility-demo {
+            height: 400px;
+            overflow-y: auto;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 2rem 0;
+        }
+
+        .visibility-item {
+            height: 200px;
+            margin: 1rem 0;
+            background: #3498db;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .visibility-item.visible {
+            background: #27ae60;
+            transform: scale(1.02);
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #e74c3c;
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        /* Responsive styles using viewport-sense CSS variables */
+        .responsive-text {
+            font-size: calc(14px + (var(--bp-width, 320) - 320) * 0.01);
+        }
+
+        /* Device-specific styles */
+        .bp-mobile-only {
+            color: #e74c3c;
+        }
+
+        .bp-tablet-only {
+            color: #f39c12;
+        }
+
+        .bp-desktop-only {
+            color: #27ae60;
+        }
+
+        /* Safe area aware padding for mobile devices */
+        .safe-area-demo {
+            background: #9b59b6;
+            color: white;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            padding-top: calc(1rem + env(safe-area-inset-top));
+            padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🎯 viewport-sense Demo</h1>
+            <p>Comprehensive viewport utility library demonstration</p>
+        </div>
+
+        <div class="demo-grid">
+            <!-- Viewport Information -->
+            <div class="demo-card">
+                <h3>📐 Viewport Information</h3>
+                <div id="viewportInfo">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Device Detection -->
+            <div class="demo-card">
+                <h3>📱 Device Detection</h3>
+                <div id="deviceInfo">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Breakpoint Queries -->
+            <div class="demo-card">
+                <h3>🔍 Breakpoint Queries</h3>
+                <div id="breakpointQueries">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Accessibility -->
+            <div class="demo-card">
+                <h3>♿ Accessibility</h3>
+                <div id="accessibilityInfo">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Responsive Demo -->
+        <div class="responsive-demo" id="responsiveDemo">
+            <h2>🎨 Responsive Demo</h2>
+            <p class="responsive-text">This content adapts to your screen size!</p>
+            <div class="bp-mobile-only">📱 Mobile Only Content</div>
+            <div class="bp-tablet-only">📋 Tablet Only Content</div>
+            <div class="bp-desktop-only">🖥️ Desktop Only Content</div>
+        </div>
+
+        <!-- Breakpoint System Switcher -->
+        <div class="demo-card">
+            <h3>⚙️ Breakpoint System</h3>
+            <p>Switch between different breakpoint systems:</p>
+            <div class="controls">
+                <button class="btn active" data-system="bootstrap">Bootstrap</button>
+                <button class="btn" data-system="tailwind">Tailwind</button>
+                <button class="btn" data-system="material">Material</button>
+                <button class="btn" data-system="foundation">Foundation</button>
+            </div>
+            <div id="systemInfo">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Safe Area Demo -->
+        <div class="safe-area-demo">
+            <h3>📱 Safe Area Demo</h3>
+            <p>This content respects device safe areas (notches, home indicators, etc.)</p>
+            <div id="safeAreaInfo">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Scroll Position Demo -->
+        <div class="demo-card">
+            <h3>📜 Scroll Position</h3>
+            <div id="scrollInfo">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Element Visibility Demo -->
+        <div class="demo-card">
+            <h3>👁️ Element Visibility</h3>
+            <p>Scroll to see elements change color when they become visible:</p>
+            <div class="visibility-demo">
+                <div class="visibility-item" data-item="1">Item 1</div>
+                <div class="visibility-item" data-item="2">Item 2</div>
+                <div class="visibility-item" data-item="3">Item 3</div>
+                <div class="visibility-item" data-item="4">Item 4</div>
+                <div class="visibility-item" data-item="5">Item 5</div>
+                <div class="visibility-item" data-item="6">Item 6</div>
+            </div>
+        </div>
+
+        <!-- CSS Variables Demo -->
+        <div class="demo-card">
+            <h3>🎨 CSS Variables</h3>
+            <p>viewport-sense automatically generates CSS custom properties:</p>
+            <div id="cssVarsInfo">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Import viewport-sense (in a real project, you'd import from npm) -->
+    <script type="module">
+        // Simulate importing from npm package
+        // In real usage: import { breakpoint, createBreakpointJS, VisibilityManager, ScrollManager } from 'viewport-sense';
+        
+        // Mock implementation for demo purposes
+        class MockBreakpointJS {
+            constructor() {
+                this.config = {
+                    breakpointSystem: 'bootstrap',
+                    autoCSSVars: true,
+                    cssVarPrefix: 'bp'
+                };
+                this.init();
+            }
+
+            init() {
+                this.updateState();
+                window.addEventListener('resize', () => this.updateState());
+                window.addEventListener('orientationchange', () => this.updateState());
+                this.updateCSSVars();
+            }
+
+            updateState() {
+                this.state = {
+                    width: window.innerWidth,
+                    height: window.innerHeight,
+                    breakpoint: this.getCurrentBreakpoint(),
+                    isMobile: window.innerWidth < 768,
+                    isTablet: window.innerWidth >= 768 && window.innerWidth < 1024,
+                    isDesktop: window.innerWidth >= 1024,
+                    isTouch: 'ontouchstart' in window,
+                    orientation: window.innerWidth > window.innerHeight ? 'landscape' : 'portrait',
+                    pixelRatio: window.devicePixelRatio || 1,
+                    safeArea: this.getSafeArea()
+                };
+                this.updateCSSVars();
+                this.updateUI();
+            }
+
+            getCurrentBreakpoint() {
+                const w = window.innerWidth;
+                const breakpoints = this.getBreakpoints();
+                
+                if (w >= breakpoints.xxl) return 'xxl';
+                if (w >= breakpoints.xl) return 'xl';
+                if (w >= breakpoints.lg) return 'lg';
+                if (w >= breakpoints.md) return 'md';
+                if (w >= breakpoints.sm) return 'sm';
+                return 'xs';
+            }
+
+            getBreakpoints() {
+                const systems = {
+                    bootstrap: { xs: 0, sm: 576, md: 768, lg: 992, xl: 1200, xxl: 1400 },
+                    tailwind: { sm: 640, md: 768, lg: 1024, xl: 1280, '2xl': 1536 },
+                    material: { xs: 0, sm: 600, md: 960, lg: 1280, xl: 1920 },
+                    foundation: { small: 0, medium: 640, large: 1024, xlarge: 1200, xxlarge: 1440 }
+                };
+                return systems[this.config.breakpointSystem] || systems.bootstrap;
+            }
+
+            getSafeArea() {
+                return {
+                    top: parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)')) || 0,
+                    right: parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-right)')) || 0,
+                    bottom: parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)')) || 0,
+                    left: parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-left)')) || 0
+                };
+            }
+
+            updateCSSVars() {
+                const root = document.documentElement;
+                root.style.setProperty('--bp-width', `${this.state.width}px`);
+                root.style.setProperty('--bp-height', `${this.state.height}px`);
+                root.style.setProperty('--bp-breakpoint', this.state.breakpoint);
+                root.style.setProperty('--bp-is-mobile', this.state.isMobile ? '1' : '0');
+                root.style.setProperty('--bp-is-tablet', this.state.isTablet ? '1' : '0');
+                root.style.setProperty('--bp-is-desktop', this.state.isDesktop ? '1' : '0');
+            }
+
+            getState() {
+                return this.state;
+            }
+
+            getDevice() {
+                const ua = navigator.userAgent;
+                return {
+                    browser: this.detectBrowser(ua),
+                    browserVersion: this.detectBrowserVersion(ua),
+                    os: this.detectOS(ua),
+                    osVersion: 'Unknown',
+                    isWebView: this.isWebView(ua),
+                    isPWA: this.isPWA(),
+                    screenDensity: this.getScreenDensity(),
+                    touchPoints: navigator.maxTouchPoints || 0,
+                    hardwareConcurrency: navigator.hardwareConcurrency || 4,
+                    colorDepth: screen.colorDepth || 24,
+                    colorGamut: 'srgb'
+                };
+            }
+
+            detectBrowser(ua) {
+                if (ua.includes('Chrome')) return 'Chrome';
+                if (ua.includes('Firefox')) return 'Firefox';
+                if (ua.includes('Safari')) return 'Safari';
+                if (ua.includes('Edge')) return 'Edge';
+                return 'Unknown';
+            }
+
+            detectBrowserVersion(ua) {
+                const match = ua.match(/(Chrome|Firefox|Safari|Edge)\/(\d+\.\d+)/);
+                return match ? match[2] : 'Unknown';
+            }
+
+            detectOS(ua) {
+                if (ua.includes('Windows')) return 'Windows';
+                if (ua.includes('Mac')) return 'macOS';
+                if (ua.includes('Linux')) return 'Linux';
+                if (ua.includes('Android')) return 'Android';
+                if (ua.includes('iOS')) return 'iOS';
+                return 'Unknown';
+            }
+
+            isWebView(ua) {
+                return ua.includes('wv') || ua.includes('WebView');
+            }
+
+            isPWA() {
+                return window.matchMedia('(display-mode: standalone)').matches;
+            }
+
+            getScreenDensity() {
+                const dpr = window.devicePixelRatio || 1;
+                if (dpr <= 1) return 'low';
+                if (dpr <= 2) return 'medium';
+                if (dpr <= 3) return 'high';
+                return 'ultra-high';
+            }
+
+            getA11y() {
+                return {
+                    prefersReducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+                    colorScheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+                    prefersHighContrast: window.matchMedia('(prefers-contrast: high)').matches,
+                    prefersReducedData: window.matchMedia('(prefers-reduced-data: reduce)').matches,
+                    forcedColors: window.matchMedia('(forced-colors: active)').matches,
+                    hasScreenReader: false
+                };
+            }
+
+            is(breakpoint) {
+                return this.state.breakpoint === breakpoint;
+            }
+
+            above(breakpoint) {
+                const breakpoints = this.getBreakpoints();
+                const current = breakpoints[this.state.breakpoint];
+                const target = breakpoints[breakpoint];
+                return current > target;
+            }
+
+            below(breakpoint) {
+                const breakpoints = this.getBreakpoints();
+                const current = breakpoints[this.state.breakpoint];
+                const target = breakpoints[breakpoint];
+                return current < target;
+            }
+
+            between(min, max) {
+                return this.above(min) && this.below(max);
+            }
+
+            updateUI() {
+                this.updateViewportInfo();
+                this.updateDeviceInfo();
+                this.updateBreakpointQueries();
+                this.updateAccessibilityInfo();
+                this.updateSystemInfo();
+                this.updateSafeAreaInfo();
+                this.updateCSSVarsDisplay();
+            }
+
+            updateViewportInfo() {
+                const info = document.getElementById('viewportInfo');
+                const state = this.getState();
+                info.innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">Width:</span>
+                        <span class="info-value">${state.width}px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Height:</span>
+                        <span class="info-value">${state.height}px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Breakpoint:</span>
+                        <span class="info-value">${state.breakpoint}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Device Type:</span>
+                        <span class="info-value">${state.isMobile ? 'Mobile' : state.isTablet ? 'Tablet' : 'Desktop'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Orientation:</span>
+                        <span class="info-value">${state.orientation}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Pixel Ratio:</span>
+                        <span class="info-value">${state.pixelRatio}</span>
+                    </div>
+                `;
+            }
+
+            updateDeviceInfo() {
+                const info = document.getElementById('deviceInfo');
+                const device = this.getDevice();
+                info.innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">Browser:</span>
+                        <span class="info-value">${device.browser}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Version:</span>
+                        <span class="info-value">${device.browserVersion}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">OS:</span>
+                        <span class="info-value">${device.os}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Touch Points:</span>
+                        <span class="info-value">${device.touchPoints}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Is PWA:</span>
+                        <span class="info-value">${device.isPWA ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Screen Density:</span>
+                        <span class="info-value">${device.screenDensity}</span>
+                    </div>
+                `;
+            }
+
+            updateBreakpointQueries() {
+                const info = document.getElementById('breakpointQueries');
+                const queries = ['xs', 'sm', 'md', 'lg', 'xl'];
+                let html = '';
+                
+                queries.forEach(bp => {
+                    html += `
+                        <div class="info-item">
+                            <span class="info-label">above('${bp}'):</span>
+                            <span class="info-value">${this.above(bp) ? 'true' : 'false'}</span>
+                        </div>
+                    `;
+                });
+
+                info.innerHTML = html;
+            }
+
+            updateAccessibilityInfo() {
+                const info = document.getElementById('accessibilityInfo');
+                const a11y = this.getA11y();
+                info.innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">Color Scheme:</span>
+                        <span class="info-value">${a11y.colorScheme}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Reduced Motion:</span>
+                        <span class="info-value">${a11y.prefersReducedMotion ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">High Contrast:</span>
+                        <span class="info-value">${a11y.prefersHighContrast ? 'Yes' : 'No'}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Reduced Data:</span>
+                        <span class="info-value">${a11y.prefersReducedData ? 'Yes' : 'No'}</span>
+                    </div>
+                `;
+            }
+
+            updateSystemInfo() {
+                const info = document.getElementById('systemInfo');
+                const breakpoints = this.getBreakpoints();
+                let html = '<h4>Current Breakpoints:</h4>';
+                
+                Object.entries(breakpoints).forEach(([name, value]) => {
+                    html += `
+                        <div class="info-item">
+                            <span class="info-label">${name}:</span>
+                            <span class="info-value">${value}px</span>
+                        </div>
+                    `;
+                });
+
+                info.innerHTML = html;
+            }
+
+            updateSafeAreaInfo() {
+                const info = document.getElementById('safeAreaInfo');
+                const safeArea = this.state.safeArea;
+                info.innerHTML = `
+                    <div class="info-item">
+                        <span class="info-label">Top:</span>
+                        <span class="info-value">${safeArea.top}px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Bottom:</span>
+                        <span class="info-value">${safeArea.bottom}px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Left:</span>
+                        <span class="info-value">${safeArea.left}px</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Right:</span>
+                        <span class="info-value">${safeArea.right}px</span>
+                    </div>
+                `;
+            }
+
+            updateCSSVarsDisplay() {
+                const info = document.getElementById('cssVarsInfo');
+                const root = getComputedStyle(document.documentElement);
+                const vars = ['--bp-width', '--bp-height', '--bp-breakpoint', '--bp-is-mobile', '--bp-is-tablet', '--bp-is-desktop'];
+                let html = '';
+                
+                vars.forEach(varName => {
+                    const value = root.getPropertyValue(varName) || 'not set';
+                    html += `
+                        <div class="info-item">
+                            <span class="info-label">${varName}:</span>
+                            <span class="info-value">${value}</span>
+                        </div>
+                    `;
+                });
+
+                info.innerHTML = html;
+            }
+
+            setBreakpointSystem(system) {
+                this.config.breakpointSystem = system;
+                this.updateState();
+            }
+        }
+
+        // Initialize the demo
+        const bp = new MockBreakpointJS();
+
+        // Breakpoint system switcher
+        document.querySelectorAll('[data-system]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('[data-system]').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                bp.setBreakpointSystem(e.target.dataset.system);
+            });
+        });
+
+        // Scroll tracking
+        let scrollInfo = { y: 0, direction: 'none', velocity: 0 };
+        let lastScrollY = 0;
+        let lastScrollTime = Date.now();
+
+        function updateScrollInfo() {
+            const now = Date.now();
+            const currentScrollY = window.pageYOffset;
+            const deltaY = currentScrollY - lastScrollY;
+            const deltaTime = now - lastScrollTime;
+            
+            scrollInfo = {
+                y: currentScrollY,
+                direction: deltaY > 0 ? 'down' : deltaY < 0 ? 'up' : 'none',
+                velocity: Math.abs(deltaY / deltaTime * 1000)
+            };
+
+            // Update scroll indicator
+            const scrollIndicator = document.getElementById('scrollIndicator');
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (currentScrollY / maxScroll) * 100;
+            scrollIndicator.style.width = `${Math.min(scrollPercent, 100)}%`;
+
+            // Update scroll info display
+            const scrollInfoEl = document.getElementById('scrollInfo');
+            scrollInfoEl.innerHTML = `
+                <div class="info-item">
+                    <span class="info-label">Scroll Y:</span>
+                    <span class="info-value">${Math.round(scrollInfo.y)}px</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Direction:</span>
+                    <span class="info-value">${scrollInfo.direction}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Velocity:</span>
+                    <span class="info-value">${Math.round(scrollInfo.velocity)}px/s</span>
+                </div>
+            `;
+
+            lastScrollY = currentScrollY;
+            lastScrollTime = now;
+        }
+
+        window.addEventListener('scroll', updateScrollInfo, { passive: true });
+
+        // Element visibility tracking
+        const visibilityObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const item = entry.target;
+                if (entry.isIntersecting) {
+                    item.classList.add('visible');
+                } else {
+                    item.classList.remove('visible');
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        document.querySelectorAll('.visibility-item').forEach(item => {
+            visibilityObserver.observe(item);
+        });
+
+        // Initialize displays
+        updateScrollInfo();
+    </script>
+</body>
+</html>
