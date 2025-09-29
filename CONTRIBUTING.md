@@ -214,7 +214,7 @@ A clear and concise description of what you expected to happen.
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
- - viewport-sense version [e.g. 1.0.0]
+ - viewport-sense version [e.g. 1.0.1]
 
 **Additional context**
 Add any other context about the problem here.

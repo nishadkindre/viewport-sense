@@ -42,4 +42,4 @@ export { CSSIntegration } from './integrations/css-utils';
 export type * from './types';
 
 // Version (this would typically be injected during build)
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.1';

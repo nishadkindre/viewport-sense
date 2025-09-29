@@ -2,10 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.1/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2024-01-01
+## [1.0.1] - 2024-01-01
 
 ### Added
 - Initial implementation of viewport-sense
@@ -76,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Full feature set: ~12KB gzipped
 - Tree-shakeable for optimal bundle sizes
 
-## [1.0.0] - TBD
+## [1.0.1] - TBD
 
 ### Added
 - Initial stable release

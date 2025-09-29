@@ -88,7 +88,7 @@ When loading from CDN, use SRI hashes:
 
 ```html
 <script 
-  src="https://unpkg.com/viewport-sense@1.0.0/dist/index.umd.js"
+  src="https://unpkg.com/viewport-sense@1.0.1/dist/index.umd.js"
   integrity="sha384-[hash-will-be-provided]"
   crossorigin="anonymous">
 </script>

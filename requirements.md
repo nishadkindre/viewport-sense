@@ -528,7 +528,7 @@ viewport-sense/
 ```json
 {
   "name": "viewport-sense",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Comprehensive viewport utility library for responsive web applications",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
